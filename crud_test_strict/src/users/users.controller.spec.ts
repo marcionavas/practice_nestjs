@@ -3,18 +3,6 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma.service';
-
-// Mock for PrismaService
-const mockPrismaService = {
-  user: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-};
 
 describe('UsersController', () => {
   let usersController: UsersController;
@@ -61,10 +49,6 @@ describe('UsersController', () => {
           provide: UsersService,
           useValue: mockUsersService,
         },
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
       ],
     }).compile();
 
@@ -81,27 +65,32 @@ describe('UsersController', () => {
         phone: '1234567890',
       };
 
-      expect(await usersController.create(createUserDto)).toEqual({
+      const result = await usersController.create(createUserDto);
+
+      const expectedResult = {
         id: 'mock-id',
         ...createUserDto,
-      });
+      };
+
+      expect(result).toEqual(expectedResult);
       expect(usersService.create).toHaveBeenCalledWith(createUserDto);
     });
   });
 
   describe('findAll', () => {
     it('should return an array of users', async () => {
-      expect(await usersController.findAll()).toEqual([
-        {
-          id: 'mock-id',
-          email: 'test@example.com',
-          firstName: 'John',
-          lastName: 'Doe',
-          phone: '1234567890',
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date),
-        },
-      ]);
+      const result = await usersController.findAll();
+      const exprectedResult = {
+        id: 'mock-id',
+        email: 'test@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '1234567890',
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      };
+
+      expect(result).toEqual([exprectedResult]);
       expect(usersService.findAll).toHaveBeenCalled();
     });
   });
@@ -109,7 +98,9 @@ describe('UsersController', () => {
   describe('findOne', () => {
     it('should return a single user by id', async () => {
       const id = 'mock-id';
-      expect(await usersController.findOne(id)).toEqual({
+
+      const result = await usersController.findOne(id);
+      const expectedResult = {
         id,
         email: 'test@example.com',
         firstName: 'John',
@@ -117,7 +108,8 @@ describe('UsersController', () => {
         phone: '1234567890',
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
-      });
+      };
+      expect(result).toEqual(expectedResult);
       expect(usersService.findOne).toHaveBeenCalledWith(id);
     });
   });
@@ -129,10 +121,13 @@ describe('UsersController', () => {
         firstName: 'Jane',
       };
 
-      expect(await usersController.update(id, updateUserDto)).toEqual({
+      const result = await usersController.update(id, updateUserDto);
+      const expectedResult = {
         id,
         ...updateUserDto,
-      });
+      };
+
+      expect(result).toEqual(expectedResult);
       expect(usersService.update).toHaveBeenCalledWith(id, updateUserDto);
     });
   });
@@ -140,7 +135,11 @@ describe('UsersController', () => {
   describe('remove', () => {
     it('should remove a user by id', async () => {
       const id = 'mock-id';
-      expect(await usersController.remove(id)).toEqual({ id });
+
+      const result = await usersController.remove(id);
+      const expectedResult = { id };
+
+      expect(result).toEqual(expectedResult);
       expect(usersService.remove).toHaveBeenCalledWith(id);
     });
   });
